@@ -1,71 +1,101 @@
-# northstar README
+# NorthStar AI 🌟
 
-This is the README for your extension "northstar". After writing up a brief description, we recommend including the following sections.
+**NorthStar AI** is a privacy-focused, local-first AI assistant designed specifically for VS Code. Powered by **Ollama**, it brings the intelligence of Large Language Models (LLMs) like DeepSeek, Llama 3, and Qwen directly into your editor without sending a single line of code to the cloud.
 
-## Features
+Experience real-time streaming, project-wide analysis, and smart documentation generation with a modern, native-feeling UI.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+![NorthStar Demo](https://picsum.photos/200/300)
+_(Replace this link with a screenshot or GIF of your extension)_
 
-For example if there is an image subfolder under your extension project workspace:
+## ✨ Key Features
 
-\!\[feature X\]\(images/feature-x.png\)
+- **🔒 Privacy-First:** Runs entirely on your local machine using Ollama. No API keys, no data leaks.
+- **⚡ Streaming & Thinking:** Real-time streaming responses with a visual "Thinking" indicator, allowing you to see the model's reasoning process (especially useful for models like DeepSeek-R1).
+- **💬 Modern Chat Interface:** A sleek, theme-aware UI featuring a floating input bar, typing indicators, and markdown rendering.
+- **📂 Explain File:** Right-click any open file to get a comprehensive explanation of its logic, architecture, and purpose.
+- **📝 Smart Documentation:** Select any block of code and generate professional JSDoc/Docstrings with a single click.
+- **🔍 Project Analysis:** Scans your workspace file structure to provide context-aware answers about your project's high-level architecture.
+- **🛑 Full Control:** Stop generation instantly (Esc) if the output isn't what you need.
+- **📜 Persistent History:** Automatically saves your conversation history—even partial responses if generation is interrupted—so you never lose context.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## 🚀 Prerequisites
 
-## Requirements
+NorthStar AI requires **Ollama** to be installed and running on your machine.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+1.  **Download Ollama:** Visit [ollama.com](https://ollama.com/) and install it.
+2.  **Pull a Model:** Open your terminal and download a model:
+    ```bash
+    ollama pull llama3
+    # or
+    ollama pull deepseek-r1:latest
+    ```
+3.  **Start Ollama:** Ensure the Ollama server is running (Default: `http://127.0.0.1:11434`).
 
-## Extension Settings
+## 📦 Installation (From Source)
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+1.  Clone the repository:
 
-For example:
+    ```bash
+    git clone [https://github.com/05Arda/NorthStar.git](https://github.com/05Arda/NorthStar.git)
+    cd NorthStar
+    ```
 
-This extension contributes the following settings:
+2.  Install dependencies for both the extension and the webview UI:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+    ```bash
+    npm install
+    cd webview-ui
+    npm install
+    cd ..
+    ```
 
-## Known Issues
+3.  Open the project in VS Code:
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+    ```bash
+    code .
+    ```
 
-## Release Notes
+4.  Press **F5** to launch the Extension Development Host.
 
-Users appreciate release notes as you update your extension.
+## 🎮 Usage
 
-### 1.0.0
+### 1. The Sidebar Chat
 
-Initial release of ...
+Click the **NorthStar** icon in the Activity Bar. Select your preferred model from the dropdown (automatically synced with `ollama ls`) and start chatting.
 
-### 1.0.1
+### 2. Context Menu Commands
 
-Fixed issue #.
+Right-click on any file tab or text selection to access quick actions:
 
-### 1.1.0
+- **NorthStar: Explain File:** Analyzes and explains the currently active file.
+- **NorthStar: Generate Docs:** Generates documentation comments for the selected code block.
 
-Added features X, Y, and Z.
+### 3. Keyboard Shortcuts
 
----
+| Command               | Shortcut (Win/Linux) | Shortcut (Mac)    | Description                             |
+| :-------------------- | :------------------- | :---------------- | :-------------------------------------- |
+| **Stop Generation**   | `Esc`                | `Esc`             | Instantly aborts the current AI stream. |
+| **Analyze Project**   | `Ctrl + Alt + A`     | `Cmd + Alt + A`   | Scans workspace structure for context.  |
+| **Explain File**      | `Ctrl + Shift + E`   | `Cmd + Shift + E` | Explains the active file.               |
+| **Explain Selection** | `Ctrl + Shift + Q`   | `Cmd + Shift + Q` | Explains the selected code block.       |
 
-## Following extension guidelines
+## ⚙️ Configuration
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+You can customize NorthStar AI via VS Code Settings (`Ctrl + ,`):
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+- `northstar.defaultModel`: The default model to load on startup (e.g., `llama3`).
+- `northstar.ollamaUrl`: The URL of your Ollama server (Default: `http://127.0.0.1:11434`).
 
-## Working with Markdown
+## 🛠️ Tech Stack
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+- **Frontend:** React, Vite, VS Code Webview UI Toolkit, CSS Modules.
+- **Backend:** TypeScript, VS Code Extension API.
+- **AI Engine:** Ollama API (Local Inference).
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+## 🤝 Contributing
 
-## For more information
+Contributions are welcome! Please feel free to submit a Pull Request or open an Issue for bugs and feature requests.
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+## 📄 License
 
-**Enjoy!**
+This project is licensed under the [MIT License](LICENSE).
