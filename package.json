@@ -1,0 +1,139 @@
+{
+  "name": "northstar",
+  "displayName": "NorthStar",
+  "description": "AI-powered codebase onboarding assistant that maps project architectures and explains source code using local LLMs.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.108.1"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:northstar.sidebarView"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "NorthStar AI",
+      "properties": {
+        "northstar.defaultModel": {
+          "type": "string",
+          "default": "qwen2.5-coder:7b",
+          "description": "The model to be pre-selected on startup."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "northstar-sidebar",
+          "title": "NorthStar",
+          "icon": "assets/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "northstar-sidebar": [
+        {
+          "type": "webview",
+          "id": "northstar.sidebarView",
+          "name": "NorthStar Chat"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "northstar.explainCode",
+        "title": "NorthStar: Explain Selection"
+      },
+      {
+        "command": "northstar.explainFile",
+        "title": "NorthStar: Explain Whole File"
+      },
+      {
+        "command": "northstar.refactorCode",
+        "title": "NorthStar: Refactor Selection"
+      },
+      {
+        "command": "northstar.generateComment",
+        "title": "NorthStar: Generate Comment for Selection"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "northstar.explainCode",
+          "group": "northstar-group@1",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "northstar.explainFile",
+          "group": "northstar-group@2",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "northstar.generateComment",
+          "group": "northstar-group@3",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "northstar.refactorCode",
+          "group": "northstar-group@4",
+          "when": "editorHasSelection"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "northstar.stopGeneration",
+        "key": "escape",
+        "when": "sideBarFocus && activeViewlet == 'northstar-sidebar'"
+      },
+      {
+        "command": "northstar.analyze",
+        "key": "ctrl+alt+a",
+        "mac": "cmd+alt+a",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "northstar.explainFile",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "northstar.explainCode",
+        "key": "ctrl+shift+q",
+        "mac": "cmd+shift+q",
+        "when": "editor.hasSelection"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.108.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.52.0",
+    "eslint": "^9.39.2",
+    "esbuild": "^0.27.2",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
