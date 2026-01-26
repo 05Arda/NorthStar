@@ -10,7 +10,6 @@ _(will be replaced with a screenshot or GIF of extension)_
 ## ✨ Key Features
 
 - **🔒 Privacy-First:** Runs entirely on your local machine using Ollama. No API keys, no data leaks.
-- **⚡ Streaming & Thinking:** Real-time streaming responses with a visual "Thinking" indicator, allowing you to see the model's reasoning process (especially useful for models like DeepSeek-R1).
 - **💬 Modern Chat Interface:** A sleek, theme-aware UI featuring a floating input bar, typing indicators, and markdown rendering.
 - **📂 Explain File:** Right-click any open file to get a comprehensive explanation of its logic, architecture, and purpose.
 - **📝 Smart Documentation:** Select any block of code and generate professional JSDoc/Docstrings with a single click.
