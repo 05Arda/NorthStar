@@ -5,7 +5,7 @@
 Experience real-time streaming, project-wide analysis, and smart documentation generation with a modern, native-feeling UI.
 
 ![NorthStar Demo](https://picsum.photos/200/300)
-_(Replace this link with a screenshot or GIF of your extension)_
+_(will be replaced with a screenshot or GIF of extension)_
 
 ## ✨ Key Features
 
