@@ -76,11 +76,6 @@
           "command": "northstar.generateComment",
           "group": "northstar-group@3",
           "when": "editorHasSelection"
-        },
-        {
-          "command": "northstar.refactorCode",
-          "group": "northstar-group@4",
-          "when": "editorHasSelection"
         }
       ]
     },

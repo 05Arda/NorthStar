@@ -1,12 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { vscode } from "./utilities/vscode";
 import ReactMarkdown from "react-markdown";
+import Mermaid from "./components/Mermaid";
+
 import {
   IoSend,
   IoSquareOutline,
   IoTrashOutline,
   IoScanCircleOutline,
 } from "react-icons/io5";
+
+import { testMessage } from "./test";
 
 import "./App.css";
 
@@ -30,7 +34,7 @@ function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "ai",
-      text: "Hello! I am **NorthStar**. Ready to analyze your code.",
+      text: testMessage(),
     },
   ]);
 
@@ -40,14 +44,41 @@ function App() {
 
   // Auto Scroll Ref
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatAreaRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLengthRef = useRef(messages.length);
+  const isStreamingRef = useRef(false);
+
+  // Kullanıcı en altta mı kontrol et
+  const isUserAtBottom = () => {
+    if (!chatAreaRef.current) return true;
+    const { scrollTop, scrollHeight, clientHeight } = chatAreaRef.current;
+    // 50px tolerans - kullanıcı neredeyse en alttaysa true döner
+    return scrollHeight - scrollTop - clientHeight < 50;
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // ✅ DÜZELTİLMİŞ SCROLL LOGIC - Sadece kullanıcı en alttaysa scroll et
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, isLoading, pendingComment]);
+    // Kullanıcı manuel olarak yukarı kaydırmışsa scroll yapma
+    if (!isUserAtBottom()) return;
+
+    // 1. Yeni mesaj eklendiğinde scroll et
+    if (messages.length > prevMessagesLengthRef.current) {
+      scrollToBottom();
+      prevMessagesLengthRef.current = messages.length;
+      return;
+    }
+
+    // 2. Streaming (isLoading) sırasında scroll et
+    if (isLoading && isStreamingRef.current) {
+      scrollToBottom();
+    }
+
+    prevMessagesLengthRef.current = messages.length;
+  }, [messages, isLoading]);
 
   // --- MESSAGE HANDLING ---
   useEffect(() => {
@@ -60,6 +91,11 @@ function App() {
             setSelectedModel(message.selectedModel);
           }
           setMessages(message.history || []);
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              scrollToBottom();
+            }, 600);
+          });
           break;
 
         case "setModels":
@@ -76,11 +112,13 @@ function App() {
             { role: "user", text: message.text },
           ]);
           setIsLoading(true);
+          setTimeout(() => scrollToBottom(), 100);
           break;
 
         // --- STREAMING LOGIC (Typing Indicator Inside Bubble) ---
         case "streamStart":
           setIsLoading(true);
+          isStreamingRef.current = true; // Streaming başladı
           setMessages((prev) => [
             ...prev,
             { role: "ai", text: "", isThinking: true }, // Boş, düşünen balon ekle
@@ -116,6 +154,7 @@ function App() {
 
         case "streamEnd":
           setIsLoading(false);
+          isStreamingRef.current = false; // Streaming bitti
           setMessages((prev) => {
             const newHistory = [...prev];
             const lastMsg = newHistory[newHistory.length - 1];
@@ -236,8 +275,14 @@ function App() {
     setIsLoading(false);
   };
 
+  // ✅ DÜZELTİLEN KISIM: handleAccept
   const handleAccept = () => {
-    if (pendingComment) vscode.postMessage({ command: "acceptComment" });
+    if (pendingComment) {
+      vscode.postMessage({
+        command: "acceptComment",
+        text: pendingComment, // Backend'e eklenecek metni gönderiyoruz
+      });
+    }
   };
 
   const handleReject = () => {
@@ -263,7 +308,7 @@ function App() {
       </div>
 
       {/* Chat Area */}
-      <div className="chat-area">
+      <div className="chat-area" ref={chatAreaRef}>
         {messages.map((msg, index) => {
           const isAi = msg.role === "ai" || msg.role === "assistant";
 
@@ -327,7 +372,28 @@ function App() {
                 /* Normal Mesaj */
                 <div className={`bubble ${isAi ? "ai" : "user"}`}>
                   {isAi ? (
-                    <ReactMarkdown>{msg.text}</ReactMarkdown>
+                    <ReactMarkdown
+                      components={{
+                        code(props) {
+                          const { children, className, node, ...rest } = props;
+
+                          // Regex kontrolünü basitleştirdik: İçinde 'mermaid' geçmesi yeterli
+                          const isMermaid = /mermaid/i.test(className || "");
+
+                          return isMermaid ? (
+                            // Eşleşme varsa bizim Mermaid bileşenini çağır
+                            <Mermaid chart={String(children).trim()} />
+                          ) : (
+                            // Eşleşme yoksa standart kod bloğu olarak göster
+                            <code {...rest} className={className}>
+                              {children}
+                            </code>
+                          );
+                        },
+                      }}
+                    >
+                      {msg.text}
+                    </ReactMarkdown>
                   ) : (
                     <span>{msg.text}</span>
                   )}

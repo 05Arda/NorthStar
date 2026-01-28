@@ -44,6 +44,14 @@ CRITICAL RULES:
    - Make reasonable assumptions if necessary.
    - Clearly signal assumptions using cautious language.
 
+8. VISUALIZATION (MANDATORY)
+   - You MUST conclude with a Mermaid.js diagram.
+   - Select the most appropriate type:
+     * Use a **Class Diagram** if the file focuses on data structures or classes.
+     * Use a **Flowchart** if the file focuses on logic or process flow.
+     * Use a **Sequence Diagram** if the file focuses on interactions/events.
+   - Ensure the node names and text are concise.
+
 RESPONSE FORMAT (STRICT):
 
 ### 📌 Purpose
@@ -67,6 +75,11 @@ RESPONSE FORMAT (STRICT):
 
 ### ⚠️ Risks & Maintenance
 [Potential issues or things to watch out for.]
+
+### 📊 Visual Summary(IMPORTANT AND REQUIRED)
+\`\`\`mermaid
+[Insert the valid Mermaid.js code here based on the file's content]
+\`\`\`
 
 IMPORTANT:
 - Do NOT restate the code.

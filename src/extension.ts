@@ -1,112 +1,57 @@
 // src/extension.ts
 import * as vscode from "vscode";
-import { SidebarProvider } from "./panels/SidebarProvider";
-import { FILE_ANALYSIS_PROMPT } from "./services/llm/prompts/fileanalysis";
-import { SELECTION_ANALYSIS_PROMPT } from "./services/llm/prompts/explainSelection";
+import { SidebarProvider } from "./sidebar/SidebarProvider";
+import { COMMANDS, VIEW_ID } from "./constants";
 
-import { OllamaClient } from "./services/llm/ollamaClient";
+// Command handlers
+import { explainSelection } from "./commands/explainSelection";
+import { generateComment } from "./commands/generateComment";
+import { explainFile } from "./commands/explainFile";
 
+/**
+ * Entry point for the NorthStar AI extension.
+ * This function is called when the extension is activated (as defined in package.json).
+ */
 export function activate(context: vscode.ExtensionContext) {
+  // Initialize the singleton instance of the Sidebar Provider
   const sidebarProvider = new SidebarProvider(context.extensionUri, context);
 
+  // Register the Webview View Provider for the sidebar
   context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(
-      "northstar.sidebarView",
-      sidebarProvider,
+    vscode.window.registerWebviewViewProvider(VIEW_ID, sidebarProvider),
+  );
+
+  // Initialize and register all available extension commands
+  registerExtensionCommands(context, sidebarProvider);
+
+  console.log("NorthStar AI is now active!");
+}
+
+/**
+ * Registers all extension commands and binds them to their respective handlers.
+ * @param context The extension context provided by VS Code.
+ * @param provider The SidebarProvider instance to be used by the commands.
+ */
+function registerExtensionCommands(
+  context: vscode.ExtensionContext,
+  provider: SidebarProvider,
+) {
+  context.subscriptions.push(
+    vscode.commands.registerCommand(COMMANDS.EXPLAIN_CODE, () =>
+      explainSelection(provider),
     ),
-  );
-  console.log("NorthStar is now active!");
-
-  // --- NEW: AUTO-START LOGIC ---
-  //const ollama = new OllamaClient();
-
-  // Check silently in the background without blocking startup
-  /*ollama.ensureServerRunning().then((isRunning) => {
-    if (!isRunning) {
-      console.warn("Ollama could not be started automatically.");
-    }
-  });*/
-
-  // --- COMMAND 1: EXPLAIN SELECTION ---
-  context.subscriptions.push(
-    vscode.commands.registerCommand("northstar.explainCode", () => {
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) return;
-
-      const filePath = editor.document.uri.fsPath;
-      const fileContent = editor.document.getText();
-      const selection = editor.selection;
-      const text = editor.document.getText(selection);
-
-      if (text) {
-        vscode.commands.executeCommand("northstar.sidebarView.focus");
-
-        const prompt = SELECTION_ANALYSIS_PROMPT(filePath, fileContent, text);
-        sidebarProvider.handleExternalInput(prompt, false);
-      }
-    }),
-  );
-
-  // --- COMMAND 2: REFACTOR SELECTION ---
-  context.subscriptions.push(
-    vscode.commands.registerCommand("northstar.refactorCode", () => {
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) return;
-
-      const selection = editor.selection;
-      const text = editor.document.getText(selection);
-
-      if (text) {
-        vscode.commands.executeCommand("northstar.sidebarView.focus");
-        sidebarProvider.handleExternalInput(
-          `Refactor this code to be cleaner and more efficient:\n\n\`\`\`\n${text}\n\`\`\``,
-          false,
-        );
-      }
-    }),
-  );
-
-  // --- Command 3: ADD COMMENT TO SELECTION ---
-  context.subscriptions.push(
-    vscode.commands.registerCommand("northstar.generateComment", async () => {
-      // Look for the visible editor if activeTextEditor is undefined (common when sidebar is focused)
-      let editor = vscode.window.activeTextEditor;
-
-      if (!editor) {
-        // Fallback: check visible editors
-        editor = vscode.window.visibleTextEditors[0];
-      }
-
-      if (!editor) {
-        vscode.window.showErrorMessage("Please click into a code file first.");
-        return;
-      }
-
-      await sidebarProvider.generateCodeComment(editor);
-    }),
-  );
-
-  // --- Command 3: EXPLAIN FILE ---
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand("northstar.explainFile", () => {
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) {
-        vscode.window.showErrorMessage("No active editor found.");
-        return;
-      }
-
-      const filePath = editor.document.uri.fsPath;
-      const fileContent = editor.document.getText();
-
-      if (fileContent) {
-        vscode.commands.executeCommand("northstar.sidebarView.focus");
-
-        const prompt = FILE_ANALYSIS_PROMPT(filePath, fileContent);
-        sidebarProvider.handleExternalInput(prompt, false);
-      }
-    }),
+    vscode.commands.registerCommand(COMMANDS.GENERATE_COMMENT, () =>
+      generateComment(provider),
+    ),
+    vscode.commands.registerCommand(COMMANDS.EXPLAIN_FILE, () =>
+      explainFile(provider),
+    ),
   );
 }
 
-export function deactivate() {}
+/**
+ * Cleanup method called when the extension is deactivated.
+ */
+export function deactivate() {
+  // Perform any necessary cleanup here (e.g., closing socket connections)
+}

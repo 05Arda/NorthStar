@@ -3,11 +3,13 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  base: "./",
   build: {
+    target: "esnext",
     outDir: "build",
     rollupOptions: {
       output: {
-        // Dosya isimlerinden hash'i kaldırıyoruz ki extension.ts bulabilsin
+        manualChunks: undefined,
         entryFileNames: `assets/[name].js`,
         chunkFileNames: `assets/[name].js`,
         assetFileNames: `assets/[name].[ext]`,
